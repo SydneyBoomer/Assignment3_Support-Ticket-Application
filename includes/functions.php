@@ -41,6 +41,12 @@ function saveTickets(array $tickets): bool
      * - file_put_contents(...)
      * - what should this function return if saving fails?
      */
+
+    $json = json_encode($tickets, JSON_PRETTY_PRINT);
+    if ($json !== false) {
+        return file_put_contents(DATA_FILE, $json) !== false;
+    }
+
     return false;
 }
 
@@ -64,7 +70,15 @@ function nextTicketId(array $tickets): int
      * Hint:
      * The next ID can be one larger than the current maximum.
      */
-    return 0;
+
+    if (empty($tickets)) {
+        return 1;
+    }
+
+    $curr_max = max($tickets);
+    return $curr_max + 1;
+    
+    
 }
 
 function filterTickets(
@@ -84,8 +98,35 @@ function filterTickets(
      * - keyword search should be case-insensitive
      * - search at least name, email, and description
      */
+    $filteredTickets = [];
+    foreach ($tickets as $ticket) {
+        if ($status !== '' $ticket['status'] !== status) {
+            continue;
+        }
+        if ($category !== '' && $ticket['category'] !== $category) {
+            continue;
+        }
 
-    return $tickets;
+        if ($query !== '') {
+            $searchQuery = strtolower($query);
+
+            $name = strtolower($ticket['name'] ?? '');
+            $email = strtolower($ticket['email'] ?? '');
+            $description = strtolower($ticket['description'] ?? '');
+
+            if (
+                strpos($name, $searchQuery) === false &&
+                strpos($email, $searchQuery) === false &&
+                strpos($description, $searchQuery) === false
+            ) {
+                continue;
+            }
+        }
+
+        $filteredTickets[] = $ticket;
+    }
+
+    return $filteredTickets;
 }
 
 function updateTicketStatus(array &$tickets, int $id, string $newStatus): bool
@@ -95,6 +136,13 @@ function updateTicketStatus(array &$tickets, int $id, string $newStatus): bool
      * Locate the ticket with the matching ID and update its status.
      * Return true if a ticket was updated, otherwise false.
      */
+
+    foreach ($tickets as $index => $ticket) {
+        if ($ticket['id'] === $id) {
+            $tickets[$index]['status'] = $newStatus;
+            return true;
+        }
+    }
 
     return false;
 }
