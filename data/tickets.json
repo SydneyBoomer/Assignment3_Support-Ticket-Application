@@ -1,29 +1,38 @@
 [
-  {
-    "id": 1,
-    "name": "Jordan Lee",
-    "email": "jordan.lee@example.com",
-    "category": "technical",
-    "description": "The dashboard does not load after I sign in.",
-    "status": "Open",
-    "attachment": null
-  },
-  {
-    "id": 2,
-    "name": "Maya Patel",
-    "email": "maya.patel@example.com",
-    "category": "billing",
-    "description": "I was charged twice for the same service.",
-    "status": "In Progress",
-    "attachment": null
-  },
-  {
-    "id": 3,
-    "name": "Chris Morgan",
-    "email": "chris.morgan@example.com",
-    "category": "account",
-    "description": "I cannot reset my password using the reset link.",
-    "status": "Resolved",
-    "attachment": null
-  }
+    {
+        "id": 1,
+        "name": "Jordan Lee",
+        "email": "jordan.lee@example.com",
+        "category": "technical",
+        "description": "The dashboard does not load after I sign in.",
+        "status": "In Progress",
+        "attachment": null
+    },
+    {
+        "id": 2,
+        "name": "Maya Patel",
+        "email": "maya.patel@example.com",
+        "category": "billing",
+        "description": "I was charged twice for the same service.",
+        "status": "In Progress",
+        "attachment": null
+    },
+    {
+        "id": 3,
+        "name": "Chris Morgan",
+        "email": "chris.morgan@example.com",
+        "category": "account",
+        "description": "I cannot reset my password using the reset link.",
+        "status": "Resolved",
+        "attachment": null
+    },
+    {
+        "id": 4,
+        "name": "Sydney Elizabeth Boomer",
+        "email": "boomers1@nku.edu",
+        "category": "technical",
+        "description": "Here is a test decription",
+        "status": "Open",
+        "attachment": null
+    }
 ]

@@ -71,12 +71,15 @@ function nextTicketId(array $tickets): int
      * The next ID can be one larger than the current maximum.
      */
 
-    if (empty($tickets)) {
-        return 1;
+    $maxId = 0;
+
+    foreach ($tickets as $ticket) {
+        if ($ticket['id'] > $maxId) {
+            $maxId = $ticket['id'];
+        }
     }
 
-    $curr_max = max($tickets);
-    return $curr_max + 1;
+    return $maxId + 1;
     
     
 }
@@ -100,7 +103,7 @@ function filterTickets(
      */
     $filteredTickets = [];
     foreach ($tickets as $ticket) {
-        if ($status !== '' $ticket['status'] !== status) {
+        if ($status !== '' && $ticket['status'] !== $status) {
             continue;
         }
         if ($category !== '' && $ticket['category'] !== $category) {

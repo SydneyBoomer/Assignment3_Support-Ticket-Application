@@ -51,7 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if (strlen($values['description']) < 20) {
-        $errors[] = 'description is too short';
+        $errors[] = 'Description must be more than 20 characters.';
     }
 
     $attachment = null;
