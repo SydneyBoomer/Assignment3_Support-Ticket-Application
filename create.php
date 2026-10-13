@@ -28,6 +28,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
      * Store useful messages in $errors.
      */
 
+    //validate name isn't empty
+    if ($values['name'] === "") {
+        $errors[] = 'Name should not be empty.';
+    }
+
+    if (!filter_var($values['email'], FILTER_VALIDATE_EMAIL)) {
+        $errors[] = 'Invalid email address.';
+    }
+
+    $categoryFound = false;
+
+    foreach (allowedCategories() as $category) {
+        if ($values['category'] === $category) {
+            $categoryFound = true;
+            break;
+        }     
+    }
+
+    if (!$categoryFound) {
+        $errors[] = 'Invalid category';
+    }
+
+    if (strlen($values['description']) < 20) {
+        $errors[] = 'description is too short';
+    }
+
     $attachment = null;
 
     /*
@@ -43,6 +69,54 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
      * Add an error to $errors if the upload is invalid.
      */
 
+    if (isset($_FILES['attachment'])) {
+        $file = $_FILES['attachment'];
+
+        if ($file['error'] !== UPLOAD_ERR_NO_FILE) {
+
+            if ($file['error'] !== UPLOAD_ERR_OK) {
+                $errors[] = 'There was a problem uploading the image.';
+            } else {
+
+                $maxSize = 2 * 1024 * 1024;
+
+                if ($file['size'] > $maxSize) {
+                    $errors[] = 'Image must be no larger than 2 MB.';
+                } else {
+
+                    $finfo = new finfo(FILEINFO_MIME_TYPE);
+                    $mimeType = $finfo->file($file['tmp_name']);
+
+                    $allowedTypes = [
+                        'image/jpeg' => 'jpg',
+                        'image/png' => 'png',
+                        'image/webp' => 'webp'
+                    ];
+
+                    if (!isset($allowedTypes[$mimeType])) {
+                        $errors[] = 'Only JPEG, PNG, and WebP images are allowed.';
+                    } else {
+
+                        $filename = bin2hex(random_bytes(16))
+                            . '.' . $allowedTypes[$mimeType];
+
+                        if (empty($errors)) {
+                            if (move_uploaded_file(
+                                $file['tmp_name'],
+                                UPLOAD_DIR . $filename
+                            )) {
+                                $attachment = $filename;
+                            } else {
+                                $errors[] = 'Failed to save the uploaded image.';
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
     if (empty($errors)) {
         $tickets = loadTickets();
 
@@ -54,7 +128,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
          * status, and attachment.
          */
 
-        // $tickets[] = $newTicket;
+        $newTicket = [
+            'id' => nextTicketId($tickets),
+            'name' => $values['name'],
+            'email' => $values['email'],
+            'category' => $values['category'],
+            'description' => $values['description'],
+            'status' => 'Open',
+            'attachment' => $attachment
+        ];
+
+        $tickets[] = $newTicket;
 
         /*
          * TODO 9:
@@ -63,6 +147,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
          * If saving succeeds, redirect to index.php.
          * Do not continue rendering this form after the redirect.
          */
+        
+        if (saveTickets($tickets)) {
+            header('Location: index.php');
+            exit;
+        } else {
+            $errors[] = 'Failed to save the ticket. Please try again.';
+        }
     }
 }
 ?>
