@@ -21,5 +21,43 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
  * when the request is invalid.
  */
 
-http_response_code(501);
-echo 'Status update not implemented yet.';
+
+$id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT);
+$status = $_POST['status'] ?? '';
+
+if ($id === false || $id === null || $id < 1) {
+    http_response_code(400);
+    exit('Invalid ticket ID.');
+}
+
+if (!in_array($status, allowedStatuses(), true)) {
+    http_response_code(400);
+    exit('Invalid ticket status.');
+}
+
+$tickets = loadTickets();
+
+$ticket = findTicketById($tickets, $id);
+
+if ($ticket === null) {
+    http_response_code(404);
+    exit('Ticket not found.');
+}
+
+if (!updateTicketStatus($tickets, $id, $status)) {
+    http_response_code(500);
+    exit('Failed to update ticket status.');
+}
+
+if (!saveTickets($tickets)) {
+    http_response_code(500);
+    exit('Failed to save ticket status.');
+}
+
+header('Location: detail.php?id=' . $id);
+exit;
+
+
+// http_response_code(501);
+// echo 'Status update not implemented yet.';
+?>
